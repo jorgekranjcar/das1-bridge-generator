@@ -1,0 +1,2375 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAS1 Bridge Generator - Amazon</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Amazon Ember', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #232F3E 0%, #131A22 100%);
+            color: #fff;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid #FF9900;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #FF9900;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #AAB7B8;
+            font-size: 1.1em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .tab {
+            background: #566573;
+            color: #fff;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1em;
+            font-weight: 600;
+            border-radius: 8px 8px 0 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #6C7A89;
+        }
+
+        .tab.active {
+            background: #FF9900;
+            color: #131A22;
+        }
+
+        .input-section {
+            background: #37475A;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            display: none;
+        }
+
+        .input-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 1.5em;
+            color: #FF9900;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #FF9900;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 8px;
+            color: #AAB7B8;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        input, textarea {
+            padding: 12px;
+            border: 2px solid #566573;
+            border-radius: 6px;
+            background: #232F3E;
+            color: #fff;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #FF9900;
+        }
+
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+            font-family: inherit;
+        }
+
+        .btn {
+            background: #FF9900;
+            color: #131A22;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+        }
+
+        .btn:hover {
+            background: #FFA91F;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 153, 0, 0.4);
+        }
+
+        .btn:disabled {
+            background: #566573;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .output-section {
+            background: #37475A;
+            border-radius: 12px;
+            padding: 30px;
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        .output-section.active {
+            display: block;
+        }
+
+        .bridge-output {
+            background: #232F3E;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #566573;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+            max-height: 600px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+
+        .copy-btn {
+            background: #146EB4;
+            color: #fff;
+        }
+
+        .copy-btn:hover {
+            background: #1A7FC1;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #566573;
+            border-top: 4px solid #FF9900;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .helper-text {
+            font-size: 0.85em;
+            color: #AAB7B8;
+            margin-top: 5px;
+        }
+
+        .targets-info {
+            background: #232F3E;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+            font-size: 0.9em;
+            border-left: 4px solid #FF9900;
+        }
+
+        .quick-fill {
+            background: #146EB4;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.85em;
+            margin-top: 10px;
+        }
+
+        .quick-fill:hover {
+            background: #1A7FC1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 DAS1 Bridge Generator</h1>
+            <p class="subtitle">Automatización de Bridges DBR/WBR - Amazon DAS1</p>
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('fpy')">📊 FPY</button>
+                <button class="tab" onclick="switchTab('fclm')">📈 FCLM Precision</button>
+                <button class="tab" onclick="switchTab('dea')">📦 DEA Miss</button>
+                <button class="tab" onclick="switchTab('capacity')">📊 Capacity WK-1</button>
+                <button class="tab" onclick="switchTab('fdds')">✅ FDDS</button>
+                <button class="tab" onclick="switchTab('fdds-casero')">🏠 FDDS Casero</button>
+                <button class="tab" onclick="switchTab('tph')">⚡ TPH</button>
+                <button class="tab" onclick="switchTab('lu')">📅 L&U</button>
+            </div>
+        </header>
+
+        <div class="input-section active" id="fpy-section">
+            <h2 class="section-title">📊 Pega tu Data de PerfectMile</h2>
+            
+            <div class="form-group">
+                <label for="rawData">Copia y pega TODA la tabla de PerfectMile aquí (formato TSV/Excel)</label>
+                <textarea id="rawData" style="min-height: 300px;" placeholder="Pega aquí los datos directamente desde PerfectMile...
+
+Ejemplo:
+Daily:
+2026-W03	SUN-11-JAN	MON-12-JAN	TUE-13-JAN	WED-14-JAN	THU-15-JAN	FRI-16-JAN	SAT-17-JAN	Total 2026-W03	Total 2026-W02	WOW ∆
+FPY DPMO
+1.1	Total FPY DPMO	0	0	-	1,701	2,799	4,721	3,124	3,533	7,539	-53.14%
+..."></textarea>
+                <span class="helper-text">💡 Tip: Selecciona toda la tabla en PerfectMile y pégala directamente aquí. La IA extraerá los datos necesarios.</span>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">📝 Contexto Adicional (Opcional)</h2>
+            <div class="form-group">
+                <label for="additionalContext">¿Algo especial que destacar hoy?</label>
+                <textarea id="additionalContext" placeholder="ej: Peak de volumen, problemas con hub receive, cambios de personal..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateBridge()">🚀 Generar Bridge con IA</button>
+            <button class="quick-fill" onclick="fillSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 Targets de Referencia (Dic 2025 - Ene 2026):</strong><br>
+                • Total FPY: 14,674 DPMO<br>
+                • FSAF: 1,827 DPMO | Inducted Not Containerized: 591 DPMO | Recycle: 8,466 DPMO<br>
+                • Double Binned: 1,335 DPMO | Inbound: 1,690 DPMO | RTS/Sidelined: 250 DPMO | Dispatch: 515 DPMO
+            </div>
+        </div>
+
+        <!-- FCLM PRECISION SECTION -->
+        <div class="input-section" id="fclm-section">
+            <h2 class="section-title">📈 Pega tu Data de FCLM Precision</h2>
+            
+            <div class="form-group">
+                <label for="fclmRawData">Copia y pega los datos de FCLM (ambos archivos: Country DS y Overstaffing)</label>
+                <textarea id="fclmRawData" style="min-height: 400px;" placeholder="Pega aquí TODA la data de los archivos Excel de FCLM:
+- Country, DS and Process Group Metrics Deep Dive
+- Overstaffing Total Planned Hours Deep Dive
+
+Puedes pegar ambos archivos uno tras otro, separados por una línea en blanco."></textarea>
+                <span class="helper-text">💡 Tip: Abre los Excel, selecciona todo (Ctrl+A) y pega aquí. La IA extraerá automáticamente los datos necesarios.</span>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">📝 Contexto Adicional (Opcional)</h2>
+            <div class="form-group">
+                <label for="fclmAdditionalContext">¿Algo especial que destacar esta semana?</label>
+                <textarea id="fclmAdditionalContext" placeholder="ej: Días específicos con problemas, razones de desviaciones conocidas..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateFCLMBridge()">🚀 Generar Bridge FCLM con IA</button>
+            <button class="quick-fill" onclick="fillFCLMSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 Target FCLM Precision:</strong><br>
+                • Target: 85%<br>
+                • Métricas principales: Process groups con mayor impacto en planned vs actual hours
+            </div>
+        </div>
+
+        <!-- DEA MISS SECTION -->
+        <div class="input-section" id="dea-section">
+            <h2 class="section-title">📦 DEA Miss - Data + Análisis Manual</h2>
+            
+            <div class="form-group">
+                <label for="deaRawData">1️⃣ Pega los datos de PerfectMile (DEA metrics)</label>
+                <textarea id="deaRawData" style="min-height: 250px;" placeholder="Pega aquí la tabla de DEA de PerfectMile con:
+- DEA Volume (units) - Last Mile
+- DEA Scan Rate (%) - Last Mile
+- Last Mile (bps)
+- DEA Misses por categoría (Not Inducted, Not Dispatched, Items missing, etc.)
+..."></textarea>
+                <span class="helper-text">💡 Tip: Copia directamente desde PerfectMile la sección de DEA.</span>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">🔍 2️⃣ Análisis Manual de Casos</h2>
+            <p style="color: #AAB7B8; margin-bottom: 15px;">Aquí introduces tu dive deep manual de los casos específicos (puedes ser breve - la IA lo desarrollará):</p>
+
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="deaInboundCases">Inbound Volume (casos y descripción)</label>
+                    <textarea id="deaInboundCases" placeholder="ej: 0 parcels"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="deaUTRCases">UTR Performance (casos y descripción)</label>
+                    <textarea id="deaUTRCases" placeholder="ej: 
+1 parcel - Empty package UTR
+Problem solved after induction
+
+💡 Escribe breve - la IA lo convertirá en RC1 profesional"></textarea>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="deaOTRCases">OTR Performance (casos detallados por RC)</label>
+                <textarea id="deaOTRCases" style="min-height: 200px;" placeholder="ej:
+7 parcels total
+Hub 2 parcels - no intentó delivery
+PNOV 3 parcels - 2 Hub 1 NOSP no encontrados
+Damage 2 parcels - 1 Hub 1 NOSP
+
+💡 Escribe breve - la IA los organizará en RC1, RC2, RC3 profesionales"></textarea>
+            </div>
+
+            <h2 class="section-title" style="margin-top: 30px;">📝 Contexto Adicional (Opcional)</h2>
+            <div class="form-group">
+                <label for="deaAdditionalContext">Notas adicionales sobre la semana</label>
+                <textarea id="deaAdditionalContext" placeholder="ej: Problemas recurrentes con Hub, mejora en NOSP..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateDEABridge()">🚀 Generar Bridge DEA con IA</button>
+            <button class="quick-fill" onclick="fillDEASampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 Target DEA Miss:</strong><br>
+                • Target: 31 bps (Last Mile)<br>
+                • Split: Inbound volume / UTR performance / OTR performance<br>
+                • Categorías principales: Not Dispatched, Items missing, Late Dispatch, Not Attempted
+            </div>
+        </div>
+
+        <!-- CAPACITY WK-1 SECTION -->
+        <div class="input-section" id="capacity-section">
+            <h2 class="section-title">📊 Capacity WK-1 & OFD Projection</h2>
+            
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📸 1️⃣ Forecast Data (Screenshot o texto)</h3>
+            <div class="form-group">
+                <label for="capacityForecastData">Pega aquí el forecast (puedes copiar la tabla como texto o describir los valores clave)</label>
+                <textarea id="capacityForecastData" style="min-height: 200px;" placeholder="Puedes pegar los valores clave del forecast:
+
+Ejemplo:
+6.1 W-1 OFD Forecast: 17,832
+Constrained OFD Forecast AM: 17,709
+Volume lost due to caps: 357
+UTR Capacity: 18,723 (AM) / 18,820 (PM)
+OTR Capacity: 20,995
+Mechanical Capacity: 36,513
+Capacity Utilization%: 94.3% (AM) / 97.07% (PM)
+
+O simplemente pega toda la tabla del screenshot."></textarea>
+                <span class="helper-text">💡 Tip: Copia los valores del forecast de Quicksight. La IA extraerá lo necesario.</span>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📝 2️⃣ Datos Manuales</h3>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="capacityActualVolume">Volumen Actual (Manifiesto: Volume + Returns + Sideline)</label>
+                    <input type="number" id="capacityActualVolume" placeholder="ej: 18277">
+                </div>
+                
+                <div class="form-group">
+                    <label for="capacitySPRD1">SPR D-1 (%)</label>
+                    <input type="number" step="0.01" id="capacitySPRD1" placeholder="ej: 9.48">
+                </div>
+
+                <div class="form-group">
+                    <label for="capacitySPRW1">SPR W-1 (%)</label>
+                    <input type="number" step="0.01" id="capacitySPRW1" placeholder="ej: dejar en blanco si es el mismo">
+                </div>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">⚙️ 3️⃣ Información Adicional</h3>
+            <div class="form-group">
+                <label for="capacityConstraintInfo">¿Hay constraint por UTR/OTR? ¿Flexeaste capacidad?</label>
+                <textarea id="capacityConstraintInfo" placeholder="ej: Constraint por UTR a 13700. Flexeamos 300 paquetes adicionales. Volume lost: 357 pero solo podemos absorber hasta el constraint."></textarea>
+                <span class="helper-text">La IA usará esto para calcular correctamente el 'Actual vs 24h' considerando volume lost y flex capacity.</span>
+            </div>
+
+            <div class="form-group">
+                <label for="capacityAdditionalContext">Contexto adicional (opcional)</label>
+                <textarea id="capacityAdditionalContext" placeholder="ej: Problemas con MNR, ajustes de capacidad durante el día..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateCapacityBridge()">🚀 Generar Bridge Capacity con IA</button>
+            <button class="quick-fill" onclick="fillCapacitySampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 Capacity WK-1 Bridge incluye:</strong><br>
+                • OFD Projection: SnOP vs 24h vs Actual (con reglas especiales para volume lost)<br>
+                • Capacity D-1 vs W-1 (%): (UTR Capacity PM - SnOP) / SnOP × 100<br>
+                • Volume lost: Paquetes perdidos por caps<br>
+                • UTR/OTR Capacity: % vs SnOP<br>
+                • Mech Capacity: ((Mechanical Capacity / SnOP) - 1) × 100 - % adicional de capacidad física<br>
+                • SPR (D-1 vs W-1): Service Provider Rate
+            </div>
+        </div>
+
+        <!-- FDDS SECTION -->
+        <div class="input-section" id="fdds-section">
+            <h2 class="section-title">✅ FDDS (First Day Delivery Success)</h2>
+            
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📊 1️⃣ Data de PerfectMile</h3>
+            <div class="form-group">
+                <label for="fddsRawData">Pega toda la tabla FDDS de PerfectMile</label>
+                <textarea id="fddsRawData" style="min-height: 250px;" placeholder="Pega aquí la tabla completa de FDDS incluyendo:
+- % First Day Delivery Success
+- FDDS Failures (Bps)
+- AMZL Owned Failures
+- Central Team Owned Failures
+- Deep Dive categories (Customer Contact, 100m Radius, Time Window, etc.)
+..."></textarea>
+                <span class="helper-text">💡 Tip: Copia directamente desde PerfectMile toda la sección FDDS.</span>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">🔍 2️⃣ Análisis Manual por Root Cause</h3>
+            <p style="color: #AAB7B8; margin-bottom: 15px;">Introduce notas breves de cada RC - la IA las desarrollará en formato profesional con RCs jerárquicos:</p>
+
+            <div class="form-group">
+                <label for="fddsCustomerContact">Customer Contact Compliance (notas breves)</label>
+                <textarea id="fddsCustomerContact" style="min-height: 150px;" placeholder="ej:
+7 parcels CNA contact miss
+HUB 3 parcels - stores no trigger contact app
+DCOM 2 parcels
+
+💡 La IA lo convertirá en: RC.1 → RC.1.1 → Top Opportunity DSPs con % y explicaciones"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="fddsTimeWindow">Planned Within Time Window Failures (notas breves)</label>
+                <textarea id="fddsTimeWindow" style="min-height: 150px;" placeholder="ej:
+8 parcels Business Closed
+All DA Opportunity - planned ok, attempted outside
+HUB 7 parcels - late sequencing commercial addresses
+
+💡 La IA lo estructurará en RC.1 → RC.1.1 profesional"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="fddsOtherRCs">Otros RCs (notas breves)</label>
+                <textarea id="fddsOtherRCs" style="min-height: 120px;" placeholder="ej:
+Previously Successful: 5 parcels UTL - DCOM no check safe place photos
+100m Radius: 3 parcels DCOM - mark before geofence
+Home Unattended: minimal
+
+💡 La IA añadirá contexto operacional realista"></textarea>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📝 3️⃣ Action Plans</h3>
+            <div class="form-group">
+                <label for="fddsActionPlans">Action Plans (puedes ser breve)</label>
+                <textarea id="fddsActionPlans" style="min-height: 150px;" placeholder="ej:
+Review contact compliance HUB DESL OSMs - XMDO - W3 daily
+Escalate CDOR negative trend DPM - XMDO/DPM - W4
+Communicate Business Closed workflow DSPs - XMDO - W3
+
+💡 La IA los formateará como AC1, AC2, AC3 con Owner y ETA profesionales"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="fddsAdditionalContext">Contexto adicional (opcional)</label>
+                <textarea id="fddsAdditionalContext" placeholder="ej: CDOR con trend negativo 5 semanas consecutivas, escalado a DPM..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateFDDSBridge()">🚀 Generar Bridge FDDS con IA</button>
+            <button class="quick-fill" onclick="fillFDDSSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 Target FDDS:</strong><br>
+                • Target: 98.19%<br>
+                • Split: AMZL Owned / Central Team Owned / Not attempted<br>
+                • AMZL Owned categories: Customer Contact, Time Window, 100m Radius, Previously Successful, Home Unattended<br>
+                • Formato: RC → RC.1 → RC.1.1 con DSPs específicos y % de impacto
+            </div>
+        </div>
+
+        <!-- FDDS CASERO SECTION -->
+        <div class="input-section" id="fdds-casero-section">
+            <h2 class="section-title">🏠 FDDS Casero (Formato Simplificado)</h2>
+            
+            <p style="color: #AAB7B8; margin-bottom: 20px;">
+                Usa esta opción cuando tengas <strong>data reducida de PerfectMile</strong> (no toda la tabla completa).
+            </p>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📊 1️⃣ Data de PerfectMile (lo que tengas)</h3>
+            <div class="form-group">
+                <label for="fddsCaseroData">Pega la data de PerfectMile que tengas</label>
+                <textarea id="fddsCaseroData" style="min-height: 250px;" placeholder="Pega lo que tengas de PerfectMile, ej:
+
+FDDS: 99.00%
+Total Misses: 172
+AMZL Owned: 80 bps
+Customer Unavailable: 58 bps, 98 parcels
+  DCOM: 51 parcels
+  NOSP: 30 parcels  
+  HUB: 17 parcels
+Business Closed: 14 bps, 23 parcels
+  DCOM: 9 parcels
+  NOSP: 9 parcels
+  HUB: 5 parcels
+UTL: 8 bps, 14 parcels
+  DCOM: 10 parcels
+  NOSP: 2 parcels
+  HUB: 2 parcels
+
+💡 Pega lo que tengas, aunque sea solo números básicos"></textarea>
+                <span class="helper-text">💡 No necesitas la tabla completa - pega lo que tengas disponible</span>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">🔍 2️⃣ Main RC (Tus Notas Operacionales)</h3>
+            <div class="form-group">
+                <label for="fddsCaseroMainRC">Escribe tus notas de rutas/issues</label>
+                <textarea id="fddsCaseroMainRC" style="min-height: 200px;" placeholder="ej:
+26 packages not attempted HUB health problems. DCOM assuming
+A34 Gijon low performance AA 15 stops support
+A75 Oviedo low performance AA 15 stops support
+A83 villages Oviedo disperse 100+ stops support
+A47 Lugones disperse 100+ stops support
+
+💡 La IA estructurará esto como Main RC profesional"></textarea>
+            </div>
+
+            <button class="btn" onclick="generateFDDSCaseroBridge()">🚀 Generar FDDS Casero con IA</button>
+            <button class="quick-fill" onclick="fillFDDSCaseroSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 FDDS Casero:</strong><br>
+                • Pega data reducida de PerfectMile (lo que tengas)<br>
+                • Añade tus notas de Main RC<br>
+                • La IA genera bridge con formato: ____AMZL-Owned____ + Main RC elaborado<br>
+                • Action Plans automáticos basados en tus issues<br>
+                • Target: 98.19%
+            </div>
+        </div>
+
+        <!-- TPH SECTION -->
+        <div class="input-section" id="tph-section">
+            <h2 class="section-title">⚡ TPH (Throughput per Hour)</h2>
+            
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📊 1️⃣ Data de PerfectMile / Horizon</h3>
+            <div class="form-group">
+                <label for="tphRawData">Pega toda la tabla TPH con todas las métricas</label>
+                <textarea id="tphRawData" style="min-height: 300px;" placeholder="Pega aquí la tabla completa de TPH incluyendo:
+- TPH Actual
+- Actual vs TPH Plan (W-1)
+- Net Volume Impact
+- Direct Hours Impact  
+- Indirect Hours Impact
+- Rostered Hours, Absenteeism, VET, VTO, etc.
+..."></textarea>
+                <span class="helper-text">💡 Tip: Copia directamente desde PerfectMile/Horizon toda la sección TPH.</span>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">🔍 2️⃣ Análisis Manual de Desviaciones</h3>
+            <p style="color: #AAB7B8; margin-bottom: 15px;">Explica brevemente las razones de las desviaciones principales (la IA lo desarrollará):</p>
+
+            <div class="form-group">
+                <label for="tphDirectHoursNotes">Direct Hours - notas breves de desviaciones</label>
+                <textarea id="tphDirectHoursNotes" style="min-height: 120px;" placeholder="ej:
+Rostered: -40hrs menos, mejor staffing
+Absenteeism: -24hrs mejor que plan
+VTO: -4hrs actionado vs 0 plan
+3L3 haciendo direct tasks en Dolphin -6hrs
+
+💡 La IA lo estructurará en I, II, III, IV profesionalmente"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tphIndirectHoursNotes">Indirect Hours - notas breves</label>
+                <textarea id="tphIndirectHoursNotes" style="min-height: 100px;" placeholder="ej:
+Actual 65.43hrs vs Plan 60.86hrs
+3L3 doing direct tasks Dolphin -6hrs (Induct, Reverse, Container building)
+YM PM direct tasks -1.23hrs (Reverse Receive)
+Perfect Mile not updated: 65.43 vs FCLM 55.52
+
+💡 La IA añadirá contexto y explicación profesional"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tphVolumeNotes">Volume Impact - notas breves</label>
+                <textarea id="tphVolumeNotes" placeholder="ej: +8.64% volume heaviness vs plan
+
+💡 Opcional - la IA puede calcularlo de la data"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="tphAdditionalContext">Contexto adicional (opcional)</label>
+                <textarea id="tphAdditionalContext" placeholder="ej: Peak day, issues específicos..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateTPHBridge()">🚀 Generar Bridge TPH con IA</button>
+            <button class="quick-fill" onclick="fillTPHSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 TPH Bridge estructura:</strong><br>
+                • Header: TPH Actual vs W-1 Plan con % variance<br>
+                • Descomposición: Net Volume + Direct Hours + Indirect Hours + Other Impacts<br>
+                • RC1: Net Volume Impact (Controllable + Uncontrollable)<br>
+                • RC2: Direct Hours (Rostered, NRW, Absenteeism, VET, VTO, SET)<br>
+                • RC3: Indirect Hours (OPS Supervisor, Yard Marshall, etc.)<br>
+                • Todos con impactos en TPH calculados
+            </div>
+        </div>
+
+        <!-- L&U SECTION -->
+        <div class="input-section" id="lu-section">
+            <h2 class="section-title">📅 L&U (Late & Undelivered)</h2>
+            
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📊 1️⃣ Data de PerfectMile</h3>
+            <div class="form-group">
+                <label for="luRawData">Pega los datos de L&U de PerfectMile</label>
+                <textarea id="luRawData" style="min-height: 200px;" placeholder="Pega aquí datos de:
+- L&U DPMO total y units
+- LATE DELIVERY DPMO y units
+- UNDELIVERED DPMO y units
+- WoW comparisons
+- Targets (December)
+..."></textarea>
+                <span class="helper-text">💡 Tip: Copia la data principal de L&U de PerfectMile.</span>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">🔍 2️⃣ Dive Deep Manual - Root Causes</h3>
+            <p style="color: #AAB7B8; margin-bottom: 15px;">Introduce el dive deep de cada categoría (puedes ser breve):</p>
+
+            <div class="form-group">
+                <label for="luLateDelivery">LATE DELIVERY - Root Causes</label>
+                <textarea id="luLateDelivery" style="min-height: 150px;" placeholder="ej:
+RC1: Not Delivered Never Attempted Late (31 units)
+Carrier VPM 6, Without attempt HUBDP 1, Missing 4, MNR VPM 1, Destroyed 2, Locker insufficient 1, Manual return too big 1
+
+RC2: Delivered Late Attempted Ontime (4 units)
+Day +6 EAD: 2 units
+Day +1 EAD: 2 units
+
+RC3: Delivered Late Attempted Late (3 units)
+Day +1 Relabel required: 2 units
+Day +1 Induct status: 1 unit
+
+💡 La IA organizará en RC.1 → RC.1.1 profesional"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="luUndelivered">UNDELIVERED - Root Causes</label>
+                <textarea id="luUndelivered" style="min-height: 100px;" placeholder="ej:
+RC1: Not Delivered Attempted Ontime (8 units)
+CNA: 4 units
+UTL: 1 unit
+BC: 3 units
+
+💡 La IA lo estructurará profesionalmente"></textarea>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📈 3️⃣ Polaris Metrics (Opcional)</h3>
+            <div class="form-group">
+                <label for="luPolarisMetrics">Métricas relacionadas de Polaris</label>
+                <textarea id="luPolarisMetrics" placeholder="ej:
+Ageing Shipments 3+ Day: 1821 DPMO (-53.16% WoW) target 2000
+FPY RTS sideline not inducted: 262 DPMO (+17.07% WoW) target 400
+EOD Scrub Missing: 7/7 days triggered
+EOD Scrub Lost: 7/7 days triggered"></textarea>
+            </div>
+
+            <h3 style="color: #AAB7B8; margin: 20px 0 15px 0;">📝 4️⃣ Action Plans</h3>
+            <div class="form-group">
+                <label for="luActionPlans">Action Plans (formato breve)</label>
+                <textarea id="luActionPlans" placeholder="ej:
+Review store performance Hub Account Manager - gyyln - WK05
+Review PNOV trends identify DA opportunities - gyyln - WK05
+
+💡 La IA los formateará como AP1, AP2 con Owner y ETA"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="luAdditionalContext">Contexto adicional (opcional)</label>
+                <textarea id="luAdditionalContext" placeholder="ej: Issues específicos de la semana..."></textarea>
+            </div>
+
+            <button class="btn" onclick="generateLUBridge()">🚀 Generar Bridge L&U con IA</button>
+            <button class="quick-fill" onclick="fillLUSampleData()">📋 Usar datos de ejemplo</button>
+
+            <div class="targets-info">
+                <strong>📌 L&U Bridge estructura:</strong><br>
+                • Header: Total L&U DPMO y units con WoW<br>
+                • Split: LATE DELIVERY vs UNDELIVERED (ambos con DPMO, units, WoW, vs target)<br>
+                • Root Causes para cada categoría con RC.1 → RC.1.1 → RC.1.2<br>
+                • Polaris Related Metrics (Ageing, FPY RTS, EOD Scrub)<br>
+                • Action Plans con Owner y ETA
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Generando bridge con IA... ⚡</p>
+        </div>
+
+        <div class="output-section" id="outputSection">
+            <h2 class="section-title">✅ Bridge Generado</h2>
+            <div class="bridge-output" id="bridgeOutput"></div>
+            <button class="btn copy-btn" onclick="copyBridge()">📋 Copiar Bridge</button>
+            
+            <div class="refine-section" id="refineSection" style="margin-top: 30px; display: none;">
+                <h3 style="color: #FF9900; margin-bottom: 15px;">🔄 ¿No te gusta algo? Refina el bridge</h3>
+                <div class="form-group">
+                    <label for="refineFeedback">¿Qué quieres cambiar o añadir?</label>
+                    <textarea id="refineFeedback" placeholder="ej: Añade más detalle en el RC2, cambia el tono de los Action Plans, incluye información sobre el impacto en el equipo, enfócate más en las soluciones..."></textarea>
+                </div>
+                <button class="btn" onclick="refineBridge()">🔄 Refinar Bridge</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let currentBridgeType = 'fpy'; // 'fpy' or 'fclm'
+        let conversationHistory = [];
+        let currentRawData = '';
+        let currentContext = '';
+
+        function switchTab(tab) {
+            // Update tab buttons
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.getAttribute('onclick') === "switchTab('" + tab + "')") t.classList.add('active');
+            });
+            
+            // Update sections
+            document.querySelectorAll('.input-section').forEach(s => s.classList.remove('active'));
+            document.getElementById(tab + '-section').classList.add('active');
+            
+            // Hide output when switching tabs
+            document.getElementById('outputSection').classList.remove('active');
+            
+            // Update current bridge type and reset conversation
+            currentBridgeType = tab;
+            conversationHistory = [];
+            currentRawData = '';
+            currentContext = '';
+        }
+
+        function fillSampleData() {
+            const sampleData = `Daily:
+2026-W03	SUN-11-JAN	MON-12-JAN	TUE-13-JAN	WED-14-JAN	THU-15-JAN	FRI-16-JAN	SAT-17-JAN	Total 2026-W03	Total 2026-W02	WOW ∆
+FPY DPMO
+1.1	Total FPY DPMO	0	0	-	1,701	2,799	4,721	3,124	3,533	7,539	-53.14%
+1.2	FPY: Inducted Not Containerized DPMO	-	-	-	0	108	57	80	61	71	-13.97%
+1.3	FPY: FSAF DPMO	-	-	-	122	269	455	561	338	754	-55.18%
+1.4	FPY: Inbound Defects DPMO	-	-	-	0	0	57	0	15	1,119	-98.63%
+1.5	FPY: Double Binned Shipments DPMO	0	0	-	0	54	57	160	492	500	-1.68%
+1.6	FPY: RTS/Sidelined Not Inducted DPMO	-	-	-	182	161	0	80	108	238	-54.84%
+1.7	FPY: Stow to End Cap Defects DPMO	-	-	-	0	0	0	0	0	0	-
+1.8	FPY: Recycle Defects DPMO	-	-	-	729	1,884	3,583	1,843	2,043	3,452	-40.82%
+1.9	FPY: Automation Controllable DPMO	-	-	-	-	-	-	-	-	-	-
+1.10	FPY: Dispatch Defects DPMO	-	-	-	668	323	512	401	476	1,405	-66.10%
+FSAF DPMO and Defects
+3.1	FPY: FSAF DPMO	-	-	-	122	269	455	561	338	754	-55.18%
+3.2	FPY: FSAF Defects	-	-	-	2	5	8	7	22	95	-76.84%
+Recycle DPMO and Defects
+8.1	FPY: Re-Inducted After 10 mins DPMO	-	-	-	243	1,130	1,706	1,122	1,060	1,539	-31.16%
+8.2	FPY: Stowed After 120 mins DPMO	-	-	-	486	753	1,877	721	983	1,912	-48.60%
+8.5	FPY: Re-Inducted After 10 mins Packages	-	-	-	4	21	30	14	69	194	-64.43%
+8.6	FPY: Stowed After 120 mins Packages	-	-	-	8	14	33	9	64	241	-73.44%
+Dispatch Defects DPMO and Defects
+10.1	FPY: Legacy Dispatch Defects DPMO	-	-	-	243	54	0	160	108	71	+50.55%
+10.2	FPY: Missort Workflow DPMO	-	-	-	182	0	114	80	92	222	-58.52%
+10.3	FPY: Non-Standard Debrief DPMO	-	-	-	243	269	398	160	276	1,111	-75.11%
+10.4	FPY: Legacy Dispatch Defects	-	-	-	4	1	-	2	7	9	-22.22%
+10.5	FPY: Missort Workflow Packages	-	-	-	3	-	2	1	6	28	-78.57%
+10.6	FPY: Non-Standard Debrief Packages	-	-	-	4	5	7	2	18	140	-87.14%`;
+            
+            document.getElementById('rawData').value = sampleData;
+            document.getElementById('additionalContext').value = 'Hub receive patterns affecting digital closure of routes';
+        }
+
+        async function generateBridge() {
+            const rawData = document.getElementById('rawData').value;
+            const additionalContext = document.getElementById('additionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de PerfectMile primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'fpy';
+            currentRawData = rawData;
+            currentContext = additionalContext;
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de calidad para Amazon Delivery Stations. 
+
+A continuación te voy a proporcionar datos en bruto de PerfectMile. Tu trabajo es:
+1. EXTRAER automáticamente los datos más recientes (última columna de datos diarios, típicamente Friday o el último día con datos)
+2. CALCULAR todas las varianzas vs targets
+3. CALCULAR porcentajes de sub-categorías
+4. GENERAR el bridge completo en el formato exacto
+
+TARGETS DE REFERENCIA:
+- Total FPY: 14,674 DPMO
+- FSAF: 1,827 DPMO
+- Inducted Not Containerized: 591 DPMO
+- Recycle Defects: 8,466 DPMO
+- Double Binned Shipments: 1,335 DPMO
+- Inbound Defects: 1,690 DPMO
+- RTS/Sidelined Not Inducted: 250 DPMO
+- Dispatch Defects: 515 DPMO
+
+FORMATO EXACTO A SEGUIR:
+
+🟢 DAS1 Total FPY at [TOTAL_DPMO] DPMO; [VARIANCE] DPMO favorable vs. Station Target (14,674). [Regression/Improvement] of [DOD_CHANGE] DPMO DoD vs [PREVIOUS_DAY].
+
+Top 3 sub-buckets (Dispatch, Recycle, FSAF):
+
+RC1): 🟢 Dispatch Defects at [DPMO] DPMO; [VARIANCE] DPMO favorable vs Target of 515 | [PARCELS] parcels
+    i) [PERCENTAGE]% Non-Standard Debrief ([DPMO] DPMO / [PARCELS] parcels): Main contributor to the bucket. __Hub receive patterns virtually affecting the digital closure of routes at the end of the shift.__
+    ii) [PERCENTAGE]% Missort Workflow ([DPMO] DPMO / [PARCELS] parcels): Parcels identified as missorts that did not complete the digital workflow correctly.
+
+RC2): 🟢 Recycle Defects at [DPMO] DPMO; [VARIANCE] DPMO favorable vs Target of 8,466 | [PARCELS] parcels
+    i) [PERCENTAGE]% Stowed After 120 mins ([DPMO] DPMO / [PARCELS] parcels): Slight delays in stowing from the buffer during the shift peak.
+    ii) [PERCENTAGE]% Re-Inducted After 10 mins ([DPMO] DPMO / [PARCELS] parcels): Packages re-processed due to initial reading or SLAM issues.
+    iii) Status: [Análisis del performance vs target]
+
+RC3): 🟢 FSAF DPMO at [DPMO] DPMO; [VARIANCE] DPMO favorable vs Target of 1,827 | [PARCELS] parcels
+    i) Status: Performance remains [excellent/good/concerning] and [well within/near/above] the target range for the [day] shift with only [X] total defects.
+
+AP1): Dispatch Management
+* 1.1 Deep dive into EOD Non-Standard Debrief errors caused by hub receive patterns virtually to ensure synchronization between teams.
+* 1.2 Audit the Missort Workflow process to ensure associates are completing the digital flow for every diverted parcel.
+* 1.3 Real-time monitoring of route closures during the debrief window to identify and resolve "virtual" receive errors immediately.
+* Owner: lluciafe@ / ETA: WIP
+
+AP2): Recycle & Buffer Management
+* 2.1 Active monitoring of Stow buffer saturation to prevent packages from exceeding the 120-minute stowage limit.
+* 2.2 Perform hourly clean of packages reaching the end of the finger back to the conveyor according to the station flow scheme.
+* 2.3 Periodic review and clearance of the Problem Solve cart to avoid backlog accumulation.
+* Owner: morlraq@ / ETA: WIP
+
+AP3): FSAF & Stow Quality Coaching
+* 3.1 L3 performance audits of GBs during the shift to provide real-time feedback on scanning accuracy.
+* 3.2 Ambassador shadowing for low-tenure associates (New Hires) to ensure proper stow sequences.
+* 3.3 Strict control of Stow WIP to prevent "blind induction" and buffer overflow.
+* Owner: morlraq@ / ETA: WIP
+
+DATOS EN BRUTO DE PERFECTMILE:
+${rawData}
+
+CONTEXTO ADICIONAL (si lo hay):
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+1. Usa emojis: 🟢 cuando esté favorable vs target (por debajo), 🟡 cuando esté cerca (+/- 10%), 🔴 cuando esté por encima
+2. Extrae automáticamente el día más reciente con datos (última columna que no sea WOW ∆)
+3. Calcula porcentajes EXACTOS: (Sub-DPMO / Total-DPMO) * 100
+4. Para DoD, compara con el día anterior
+5. Las explicaciones de cada sub-bucket deben ser concisas y profesionales
+6. Si falta algún dato de parcels en la tabla, usa solo DPMO y no menciones parcels
+7. Mantén EXACTAMENTE el formato mostrado arriba
+8. IMPORTANTE: Si el contexto adicional proporciona información breve o esquemática (ej: "problemas con hub receive", "peak de volumen"), DESARROLLA y ELABORA estas notas convirtiéndolas en explicaciones profesionales y detalladas para los sub-buckets relevantes. Por ejemplo:
+   - "problemas hub receive" → "Hub receive patterns virtually affecting the digital closure of routes at the end of the shift"
+   - "delays en stow" → "Slight delays in stowing from the buffer during the shift peak due to increased volume"
+   - "new hires" → "Higher defect rate attributed to low-tenure associates still learning proper stow sequences"
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        function copyBridge() {
+            const bridgeText = document.getElementById('bridgeOutput').textContent;
+            navigator.clipboard.writeText(bridgeText).then(() => {
+                alert('✅ Bridge copiado al portapapeles!');
+            }).catch(err => {
+                alert('Error al copiar: ' + err);
+            });
+        }
+
+        // ===== FCLM PRECISION FUNCTIONS =====
+        
+        function fillFCLMSampleData() {
+            const sampleData = `Country, DS and Process Group Metrics Deep Dive
+ES		FCLM Precision %	0.863936
+	Actual Hours	1316.7917
+	Planned Hours	1488.970381
+	Delta Defect Hours - Abs	381.764526
+	Delta Defect Hours - Raw	-172.178681
+
+Overstaffing Total Planned Hours Deep Dive
+Country	Station	Labor Process	ALPS W-1 Hours	Total Planned Hours (Readj.)	Actual FCLM Hours	Raw Delta Hours
+ES	DAS1	ASML Pusher (100944)	46.6566	49.141448	17.6793	-31.462148
+ES	DAS1	Pick and Stage (100407)	128.024213	125.455713	161.562	36.106287
+ES	DAS1	Pick to Buffer (100440)	261.523524	275.193387	244.9891	-30.204287
+ES	DAS1	Training / Safety School (100436)	24.444901	26.021992	3.1227	-22.899292
+ES	DAS1	UTR Supervisor/Shift Assistant (100464)	333	333	248.5772	-84.4228`;
+            
+            document.getElementById('fclmRawData').value = sampleData;
+            document.getElementById('fclmAdditionalContext').value = 'Problemas específicos en Combined Stow los días 19 y 25 de Octubre';
+        }
+
+        async function generateFCLMBridge() {
+            const rawData = document.getElementById('fclmRawData').value;
+            const additionalContext = document.getElementById('fclmAdditionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de FCLM primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'fclm';
+            currentRawData = rawData;
+            currentContext = additionalContext;
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de FCLM Precision para Amazon Delivery Stations.
+
+A continuación te voy a proporcionar datos en bruto de FCLM Precision (pueden venir de dos archivos Excel diferentes). Tu trabajo es:
+1. EXTRAER automáticamente el FCLM Precision % actual
+2. IDENTIFICAR los process groups con mayor impacto (mayor delta entre planned y actual hours)
+3. CALCULAR variance vs target (85%)
+4. GENERAR el bridge completo en el formato exacto
+
+TARGET: 85% FCLM Precision
+
+FORMATO EXACTO A SEGUIR:
+
+FCLM Precision at [X]%, [Y] bps unfavorable vs target (Target 85%), [Z] bps WoW
+Overstaff Precision at [X]%
+ 
+The main buckets that impact FCLM Process Precision are:
+ 
+RC1 Process group [PROCESS_NAME] with an impact of [PLANNED] h planned vs [ACTUAL] h actual. ([PRECISION]% precision)
+[Fechas afectadas si se mencionan]:
+i) FCLM planned hours for [DATES] show [DIFFERENCE] hours difference in regards to Planned Hours ([PRECISION]% Precision).
+ 
+RC2 Process group [PROCESS_NAME] with an impact of [PLANNED] h planned vs [ACTUAL] h actual. ([PRECISION]% precision)
+[Fechas afectadas si se mencionan]:
+i) FCLM planned hours for [DATES] show [DIFFERENCE] hours difference in regards to Planned Hours ([PRECISION]% Precision).
+
+[Si hay RC3, añadirlo siguiendo el mismo formato]
+ 
+AP1. Dive deep about the reason being for this amount of Planned Hours to cover [PROCESS_NAME] on [DATES]. Raise ticket to dive deep about this potential wrong data [link si lo hay] Owner: AM SM. ETA: wk[XX].
+ 
+AP2. Review HC planning before the shift and follow-up hourly to make sure all AAs are correctly tasked, and monitor throughout the shift to avoid mismatches between physical and virtual tasking.
+Owner: NS + AM Wk [XX]
+
+DATOS EN BRUTO DE FCLM:
+${rawData}
+
+CONTEXTO ADICIONAL (si lo hay):
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+1. Extrae el FCLM Precision % del campo "FCLM Precision %"
+2. Calcula bps (basis points) vs target 85%: (Target - Actual) * 100
+3. Identifica los TOP 2-3 process groups con MAYOR impacto absoluto (mayor |Raw Delta Hours|)
+4. Para cada process group, calcula precision: (Actual / Planned) * 100
+5. IMPORTANTE: Si el contexto menciona problemas o fechas de forma breve (ej: "problemas Combined Stow días 19 y 25", "issues con Training"), DESARROLLA estas notas en explicaciones profesionales y detalladas incorporándolas en los RCs relevantes. Por ejemplo:
+   - "problemas Combined Stow" → "FCLM planned hours for October 19th and October 25th show significant difference in regards to Planned Hours due to incorrect data in the forecasting system"
+   - "peak de volumen" → "Unexpected volume surge resulted in deviation from planned staffing levels"
+6. Genera action plans realistas y concretos basados en los issues identificados
+7. Mantén el formato EXACTO mostrado arriba
+8. Si no hay datos de WoW, puedes omitir esa parte o usar "N/A"
+
+Nota: Algunos process groups pueden tener overstaffing (más actual que planned) y otros understaffing (menos actual que planned). Enfócate en los que tienen el MAYOR impacto absoluto.
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== DEA MISS FUNCTIONS =====
+        
+        function fillDEASampleData() {
+            const sampleData = `Daily:
+2026-W03	SUN-11-JAN	MON-12-JAN	TUE-13-JAN	WED-14-JAN	THU-15-JAN	FRI-16-JAN	SAT-17-JAN	Total 2026-W03	Total 2026-W02	WOW ∆
+Total
+1.1	DEA Volume (units) - Last Mile	15,178	23,625	21,135	21,327	22,859	22,851	16,223	143,198	159,711	-10.34%
+1.2	DEA Scan Rate (%) - Last Mile	99.96%	99.94%	99.96%	99.91%	99.92%	99.82%	99.82%	99.90%	99.95%	-0.04%
+1.3	% Attempted in DEA (Units) - Last Mile	98.82%	99.01%	97.60%	97.72%	97.22%	99.14%	97.33%	98.13%	97.91%	+0.23%
+1.4	Last Mile (bps)	2	6	5	2	4	1	2	3	5	-34.45%
+1.5	Last Mile (bps) [DS drilldown]	2	6	5	2	4	1	2	3	5	-34.45%
+1.6	Last Mile	3	13	11	5	8	3	4	47	80	-41.25%
+DEA Misses
+4.1	Not Inducted on time	1	-	-	1	3	-	-	5	4	+25.00%
+4.2	Not Dispatched	2	2	-	1	1	1	4	11	32	-65.63%
+4.3	Items missing	-	1	2	-	-	-	-	3	8	-62.50%
+4.4	Out of delivery time	-	-	-	-	-	-	-	-	3	-
+4.5	Late Dispatch	-	10	2	-	1	-	-	13	18	-27.78%
+4.6	Not Attempted	-	-	-	-	1	-	-	1	-	-
+4.7	Other	-	-	1	3	1	-	-	5	7	-28.57%`;
+            
+            document.getElementById('deaRawData').value = sampleData;
+            document.getElementById('deaInboundCases').value = '0 parcels';
+            document.getElementById('deaUTRCases').value = `1 parcel
+RC1) Empty package – UTR
+1 parcel Empty package identified and problem solved immediately after induction.`;
+            document.getElementById('deaOTRCases').value = `7 parcels
+RC1) Hub – Not attempted delivery
+2 parcels dropped at Hub without a delivery attempt.
+
+RC2) PNOV – Hub / NOSP
+3 parcels not found during route execution or Hub debrief (2 Hub / 1 NOSP).
+
+RC3) Package integrity issues – HUB / NOSP
+2 parcels Operational damage identified during handling (1 Hub / 1 NOSP).`;
+            document.getElementById('deaAdditionalContext').value = 'Problemas recurrentes con Hub performance';
+        }
+
+        async function generateDEABridge() {
+            const rawData = document.getElementById('deaRawData').value;
+            const inboundCases = document.getElementById('deaInboundCases').value;
+            const utrCases = document.getElementById('deaUTRCases').value;
+            const otrCases = document.getElementById('deaOTRCases').value;
+            const additionalContext = document.getElementById('deaAdditionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de DEA de PerfectMile primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'dea';
+            currentRawData = rawData;
+            currentContext = JSON.stringify({
+                inbound: inboundCases,
+                utr: utrCases,
+                otr: otrCases,
+                additional: additionalContext
+            });
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de DEA (Delivered and Expected) Miss para Amazon Delivery Stations.
+
+A continuación te voy a proporcionar:
+1. Datos en bruto de PerfectMile con métricas de DEA
+2. Análisis manual detallado de los casos específicos (Inbound, UTR, OTR)
+
+Tu trabajo es GENERAR el bridge completo en el formato exacto.
+
+TARGET: 31 bps DEA Miss (Last Mile)
+
+FORMATO EXACTO A SEGUIR:
+
+🟢 DAS1 AFN LM DEA at [X] bps | +[Y] bps better than target (31 bps Target) | [Z] units impacted
+
+The impact is split in:
+i) Inbound volume
+ii) UTR performance
+iii) OTR performance
+
+__Inbound volume__ [X] parcels
+
+[Si hay casos: descripción breve. Si no hay: "No inbound-related DEA misses identified"]
+
+__UTR performance__ [X] parcels
+
+__RC1) [Categoría] – UTR__
+[Descripción concisa del issue con contexto operacional relevante]
+
+__RC2) [Si hay más RCs, añadir]__
+[Descripción]
+
+__OTR performance__ [X] parcels
+
+__RC1) [Categoría] – [Hub/DCOM/NOSP]__
+[Descripción concisa del issue con contexto operacional relevante]
+
+__RC2) [Si hay más RCs, añadir]__
+[Descripción]
+
+AP1) [Acción específica sin florituras]. Owner: [owner]@, ETA: WK[XX]
+
+AP2) [Acción específica]. Owner: [owner]@, ETA: WK[XX]
+
+DATOS EN BRUTO DE PERFECTMILE:
+${rawData}
+
+ANÁLISIS MANUAL DE CASOS:
+
+Inbound Volume:
+${inboundCases || 'No especificado'}
+
+UTR Performance:
+${utrCases || 'No especificado'}
+
+OTR Performance:
+${otrCases || 'No especificado'}
+
+CONTEXTO ADICIONAL:
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+1. Usa emoji 🟢 cuando esté better than target (por debajo de 31 bps), 🟡 cuando esté cerca, 🔴 cuando esté por encima
+2. Extrae el "Last Mile (bps)" más reciente de la data (última columna con datos)
+3. Calcula la diferencia vs target: (31 - Actual)
+4. El total de units impacted es la suma de las columnas "Last Mile" (no bps, sino units)
+5. Usa EXACTAMENTE el formato de __Inbound volume__, __UTR performance__, __OTR performance__ con doble underscore
+6. Para Inbound/UTR: Si hay 0 parcels, escribe "No inbound-related DEA misses identified" o "No UTR-related DEA misses identified"
+7. Para OTR, usa formato ____RC1) [Categoría] – [Ubicación]____ con CUÁDRUPLE underscore
+8. IMPORTANTE - BREVEDAD Y CONTEXTO: Las descripciones de los RCs deben ser:
+   - MUY concisas: 1-2 oraciones máximo
+   - Contexto operacional mínimo relevante
+   - Ejemplos buenos:
+     * "1 parcel marked as PNOV by veteran DA with 3+ years of experience (valued at €13.21). Isolated case"
+     * "2 parcels dropped at hub without delivery attempt. This store is a repeat top offender with 20+ packages dropped yesterday"
+   - NO uses formato verboso "X parcels [descripción larga]" - integra el número en la narrativa de forma natural
+9. Las notas breves que te proporciono son ESQUEMÁTICAS. Desarróllalas con:
+   - Contexto mínimo (ej: "veteran DA", "repeat offender")
+   - Valor monetario si es relevante
+   - Patrón o tendencia si existe (ej: "20+ packages dropped yesterday")
+10. **Action Plans - MISMO FORMATO QUE FDDS**:
+    - Formato: AP1) [Acción]. Owner: [owner]@, ETA: WK[XX]
+    - SIN FLORITURAS ni lenguaje IA
+    - Lenguaje directo, operacional, concreto
+    - Owner típico: lluciafe@ (AMDO), morlraq@ (Operations), gyyln@
+    - Ejemplos de tono correcto (sin literatura):
+      * ✅ "Escalation sent to Hub Account Manager regarding Store LZYN - Deli Fresa repeated offender pattern with 20+ packages dropped yesterday, requesting immediate corrective action plan"
+      * ✅ "Update PNOV tracker with top opportunity DAs, stowers, and handlers identified in WK8, analyze monetary value patterns and implement targeted coaching for repeat offenders"
+      * ❌ "Leverage strategic stakeholder engagement to optimize cross-functional synergies" (muy IA)
+11. Owners: usa formato [owner]@ (ej: lluciafe@, morlraq@, gyyln@)
+12. Mantén el formato EXACTO mostrado arriba, incluyendo saltos de línea y espaciado
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== CAPACITY WK-1 FUNCTIONS =====
+        
+        function fillCapacitySampleData() {
+            const sampleForecast = `6.1 W-1 OFD Forecast: 17,832
+1.1 Constrained OFD Forecast (AM): 17,709
+1.6 Capacity Utilization% (AM): 94.3%
+1.6 Capacity Utilization% (PM): 97.07%
+1.5 Volume lost due to caps: 357
+5.1 UTR Capacity: 18,723 (AM) / 18,820 (PM)
+5.2 OTR Capacity: 20,995
+5.3 Mechanical Capacity: 36,513
+6.2 W-1 vs D-1 OFD: 464
+6.3 W-1 vs D-1 OFD%: 2.6%`;
+            
+            document.getElementById('capacityForecastData').value = sampleForecast;
+            document.getElementById('capacityActualVolume').value = '18277';
+            document.getElementById('capacitySPRD1').value = '9.48';
+            document.getElementById('capacitySPRW1').value = '';
+            document.getElementById('capacityConstraintInfo').value = 'Constraint por UTR a 18820. Flexeamos capacidad para absorber parte del volume lost (357 parcels).';
+            document.getElementById('capacityAdditionalContext').value = '';
+        }
+
+        async function generateCapacityBridge() {
+            const forecastData = document.getElementById('capacityForecastData').value;
+            const actualVolume = document.getElementById('capacityActualVolume').value;
+            const sprD1 = document.getElementById('capacitySPRD1').value;
+            const sprW1 = document.getElementById('capacitySPRW1').value;
+            const constraintInfo = document.getElementById('capacityConstraintInfo').value;
+            const additionalContext = document.getElementById('capacityAdditionalContext').value;
+
+            if (!forecastData.trim() || !actualVolume.trim()) {
+                alert('⚠️ Por favor completa al menos el forecast data y el volumen actual');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'capacity';
+            currentRawData = forecastData;
+            currentContext = JSON.stringify({
+                actualVolume,
+                sprD1,
+                sprW1,
+                constraintInfo,
+                additionalContext
+            });
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de Capacity WK-1 y OFD Projection para Amazon Delivery Stations.
+
+A continuación te voy a proporcionar:
+1. Datos del forecast (W-1, 24h, capacidades UTR/OTR/Mech)
+2. Volumen actual real
+3. SPR (Service Provider Rate) D-1 y W-1
+4. Información sobre constraints y flex capacity
+
+Tu trabajo es GENERAR el bridge completo en el formato exacto.
+
+FORMATO EXACTO A SEGUIR:
+
+Volume OFD:	
+S&OP: 	[W-1_FORECAST]
+24h: 	[24H_FORECAST]
+Actual: 	[ACTUAL_VOLUME]	
+
+Actual vs SnOP: 	[X]%
+Actual vs 24h: 	[Y]%	
+
+DAS1 | Capacity D-1 vs W-1 (%): [Z]% | Volume lost [N] | OTR Capacity: [X]% vs SnOP | UTR Capacity: [Y]% vs SnOP | Mech Capacity: [Z]% | SPR (D-1 vs W-1): [W]%
+
+DATOS DEL FORECAST:
+${forecastData}
+
+DATOS MANUALES:
+- Volumen Actual: ${actualVolume}
+- SPR D-1: ${sprD1}%
+- SPR W-1: ${sprW1 || 'N/A'}
+- Constraint Info: ${constraintInfo || 'Ninguno proporcionado'}
+
+CONTEXTO ADICIONAL:
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS PARA LOS CÁLCULOS:
+
+1. **S&OP (W-1 OFD Forecast)**: Extrae el valor "6.1 W-1 OFD Forecast" del forecast data
+
+2. **24h Forecast**: Usa "1.1 Constrained OFD Forecast" del AM. PERO ATENCIÓN:
+   - Si hay "Volume lost due to caps" en el forecast
+   - Y si flexeamos capacidad (mencionado en Constraint Info)
+   - El valor de 24h debe ser: OFD AM + (volume lost absorbido hasta el constraint)
+   - Ejemplo: Si OFD AM es 17,709, perdemos 357, pero solo podemos flex hasta el constraint, el 24h podría ser mayor
+   
+3. **Actual vs SnOP (%)**: ((Actual - S&OP) / S&OP) × 100
+
+4. **Actual vs 24h (%)**: ((Actual - 24h ajustado) / 24h ajustado) × 100
+   - IMPORTANTE: Usa el 24h ajustado con volume lost si aplica
+
+5. **Capacity D-1 vs W-1 (%)**: 
+   - IMPORTANTE: Este es la diferencia entre UTR Capacity Forecast PM vs SnOP W-1
+   - Fórmula: ((UTR Capacity PM - S&OP) / S&OP) × 100
+   - NO uses el valor "6.3 W-1 vs D-1 OFD%" del forecast
+   - Ejemplo: Si UTR PM es 18,820 y SnOP es 17,832 → ((18,820 - 17,832) / 17,832) × 100 = 5.54%
+
+6. **Volume lost**: Extrae "1.5 Volume lost due to caps" del forecast
+
+7. **OTR Capacity vs SnOP (%)**: 
+   - Extrae OTR Capacity del forecast
+   - Calcula: ((OTR Capacity - S&OP) / S&OP) × 100
+
+8. **UTR Capacity vs SnOP (%)**: 
+   - Extrae UTR Capacity del forecast (usa PM si hay ambos AM/PM)
+   - Calcula: ((UTR Capacity PM - S&OP) / S&OP) × 100
+
+9. **Mech Capacity (%)**: 
+   - IMPORTANTE: Este es el % ADICIONAL de capacidad física que tienes sobre el SnOP
+   - Fórmula: ((Mechanical Capacity / S&OP) - 1) × 100
+   - Ejemplo: Si Mech Capacity es 35,080 y SnOP es 15,000 → ((35,080 / 15,000) - 1) × 100 = 133.87%
+   - Esto indica que tienes un 133% MÁS de capacidad física respecto al forecast
+   - Es decir, puedes absorber 2.33x el volumen del SnOP
+
+10. **SPR (D-1 vs W-1)**: Usa el SPR D-1 proporcionado (si W-1 es diferente, menciónalo)
+
+IMPORTANTE - ELABORACIÓN DE CONTEXTO BREVE:
+Si el campo "Constraint Info" o "Contexto Adicional" contiene información breve o esquemática (ej: "constraint UTR", "flexeamos 300", "problemas MNR"), DESARROLLA estas notas en explicaciones claras que ayuden a entender:
+- Por qué hay constraint y en qué capacidad
+- Cuánto volume lost se pudo absorber y cuánto no
+- Cómo afecta esto al cálculo del 24h ajustado
+
+Ejemplo:
+- Input: "constraint UTR 18820, volume lost 357"
+- Output en tu razonamiento: "Station had constraint by UTR at 18,820. Although volume lost was 357 parcels, we flexed capacity to absorb all lost volume up to the UTR constraint, resulting in adjusted 24h forecast of 18,066"
+
+FORMATO DE SALIDA:
+- Usa tabulaciones para alinear los valores
+- Mantén EXACTAMENTE el formato mostrado arriba
+- Los porcentajes deben tener 2 decimales
+- Los volúmenes sin decimales
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== FDDS FUNCTIONS =====
+        
+        function fillFDDSSampleData() {
+            const sampleData = `Daily:
+2026-W03	FRI-16-JAN	SAT-17-JAN	Total 2026-W03	Total 2026-W02	WOW ∆
+FDDS
+1.1	% First Day Delivery Success	99.22%	98.72%	99.13%	98.97%	+0.15%
+1.2	1st Day Dispatched	17,432	12,160	108,937	121,197	-10.12%
+1.3	First Day Delivered [FDDS]	17,287	11,996	107,959	119,900	-9.96%
+FDDS Summary
+2.1	% FDDS (First Day Delivery Success)	99.14%	98.64%	99.09%	98.94%	+0.15%
+2.2	1st Day Delivered Ships	17,314	12,015	108,075	119,933	-9.89%
+2.3	FDDS Failure	151	166	992	1,280	-22.50%
+2.4	FDDS Failures (Bps)	86.46	136.28	90.95	105.60	-13.87%
+2.5	AMZL Owned Failure Total	40	30	254	273	-6.96%
+2.6	AMZL Owned Failures (bps)	22.90	24.63	23.29	22.52	+3.40%
+2.7	Central Team Owned Failure Total	61	95	442	683	-35.29%
+2.8	Central Team Owned Failures (bps)	34.93	77.99	40.53	56.35	-28.08%
+2.9	Other Failures Total	50	41	296	324	-8.64%
+2.10	FDDS Remaining Buckets (bps)	28.63	33.66	27.14	26.73	+1.53%
+FDDS Deep Dive - AMZL Owned
+3.5	AMZL - Customer Contact Compliance	10	8	63	121	-47.93%
+3.6	Customer Contact Compliance (Bps)	5.73	6.57	5.78	9.98	-42.14%
+3.7	AMZL - Planned Within Time Window Failures	8	14	46	63	-26.98%
+3.8	Planned Within Time Window Failures (Bps)	4.58	11.49	4.22	5.20	-18.85%
+3.9	FDDS - Unable To Locate (UTL)	5	-	22	36	-38.89%
+3.10	Previously Successful Deliveries Check (Bps)	2.86	-	2.02	2.97	-32.08%
+3.3	AMZL - Defect 100m Radius Compliance	3	2	32	43	-25.58%
+3.4	Defect 100m Radius Compliance (Bps)	1.72	1.64	2.93	3.55	-17.29%`;
+            
+            document.getElementById('fddsRawData').value = sampleData;
+            document.getElementById('fddsCustomerContact').value = `22 parcels CNA
+HUB 15 parcels - LZYN Deli Fresa 26 parcels blocked Fri-Mon detected 20:40 no time missort reaction
+NOSP 5 parcels
+DCOM 2 parcels`;
+            
+            document.getElementById('fddsTimeWindow').value = `7 parcels BC
+DCOM 4 late sequencing commercial stops
+NOSP 2 route execution delays`;
+            
+            document.getElementById('fddsOtherRCs').value = `9 parcels 100m radius violations distributed CNA BC UTL
+NOSP 4 parcels geofence violations CNA BC
+DCOM 3 parcels
+UNKNOWN 2 parcels rescheduled attempts`;
+            
+            document.getElementById('fddsActionPlans').value = `escalacion hub account manager tienda bloqueada planes accion explicaciones
+proceso estandar rescate paqueteria tiendas evitar negativa dsp hub amdo mediando
+comunicar dcom nosp das intentando fuera horario comercial retrain`;
+            
+            document.getElementById('fddsAdditionalContext').value = '';
+        }
+
+        async function generateFDDSBridge() {
+            const rawData = document.getElementById('fddsRawData').value;
+            const customerContact = document.getElementById('fddsCustomerContact').value;
+            const timeWindow = document.getElementById('fddsTimeWindow').value;
+            const otherRCs = document.getElementById('fddsOtherRCs').value;
+            const actionPlans = document.getElementById('fddsActionPlans').value;
+            const additionalContext = document.getElementById('fddsAdditionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de FDDS de PerfectMile primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'fdds';
+            currentRawData = rawData;
+            currentContext = JSON.stringify({
+                customerContact,
+                timeWindow,
+                otherRCs,
+                actionPlans,
+                additionalContext
+            });
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de FDDS (First Day Delivery Success) para Amazon Delivery Stations.
+
+TARGET: 98.19% FDDS
+LÍMITE: Máximo 2000 caracteres
+
+FORMATO EXACTO (CONCISO):
+
+🟢 FDDS at [X]% with [Y] misses +[Z] bps favorable to target of 98.19%, [+/-W] bps vs WK[X] (o vs D-1 si es bridge diario).
+
+______Overall Impact:______
+    [X] bps – AMZL Owned misses ([+/-Y] bps vs WK[X])
+    [X] bps – Central Team Owned misses ([+/-Y] bps vs WK[X])
+    [X] bps – Not attempted misses ([+/-Y] bps vs WK[X])
+
+______AMZL-Owned (Root Causes):______
+
+[X] bps - [Categoría Principal 1], [+/-Y] bps vs WK[X]
+    RC.1 – [N] parcels of impact due to [razón concisa y directa]
+    RC.1.1 – [%] ([N] parcels) attributed to [DSP type] [descripción específica]. [Caso crítico específico si lo proporcionas en 1 oración].
+____    Other DSPs:__
+        [DSP type] ([%], [N] parcels): [razón ultra breve]
+        [DSP type] ([%], [N] parcels): [razón ultra breve]
+
+[X] bps - [Categoría Principal 2], [+/-Y] bps vs WK[X]
+    RC.2 – [N] parcels of impact due to [razón concisa]
+__    Top Opportunity DSPs:__
+        [DSP type] ([%], [N] parcels)
+        [DSP type] ([%], [N] parcels)
+
+[X] bps - [Categoría Principal 3], [+/-Y] bps vs WK[X]
+    RC.3 – [N] parcels of impact due to [razón concisa].
+    RC.3.1 – [Evento crítico específico si lo proporcionas].
+    __Other DSPs:__
+     __   [DSP type] ([%], [N] parcels)__
+        [DSP type] ([%], [N] parcels): [detalles si los hay]
+        [DSP type] ([%], [N] parcels): [detalles si los hay]
+
+AP1) [Acción específica sin mucha literatura]. Owner: lluciafe@, ETA: WK[X]
+AP2) [Acción específica]. Owner: lluciafe@, ETA: WK[X]  
+AP3) [Acción específica]. Owner: lluciafe@, ETA: WK[X]
+
+DATOS EN BRUTO DE PERFECTMILE:
+${rawData}
+
+ANÁLISIS MANUAL DE ROOT CAUSES (notas breves de los 3 RCs principales con MAYOR impacto en bps):
+
+Customer Contact Compliance:
+${customerContact || 'No especificado'}
+
+Planned Within Time Window / Business Closed:
+${timeWindow || 'No especificado'}
+
+100m Radius / UTL / Otra categoría principal:
+${otherRCs || 'No especificado'}
+
+ACTION PLANS (notas breves):
+${actionPlans || 'No especificado'}
+
+CONTEXTO ADICIONAL:
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+
+1. **SIEMPRE 3 ROOT CAUSES**: Los 3 con MAYOR impacto en bps de AMZL Owned
+
+2. **COMPARACIÓN TEMPORAL**:
+   - Si es bridge DIARIO: compara vs D-1 (día anterior)
+   - Si es bridge SEMANAL: compara vs WK anterior (ej: WK8 vs WK7)
+   - El formato del header cambia: "vs D-1" o "vs WK7" según corresponda
+
+3. **NUMERACIÓN DE RCs**: USA RC.1, RC.2, RC.3 (no repitas RC.1 tres veces)
+   - Primer RC principal: RC.1
+   - Segundo RC principal: RC.2
+   - Tercer RC principal: RC.3
+
+4. **CONCISIÓN EXTREMA** (máximo 2000 caracteres):
+   - RC.X en UNA oración directa
+   - Eventos críticos específicos que yo proporcione en UNA oración como RC.X.1
+   - DSPs ultra breves (3-5 palabras máximo)
+
+5. **Seis guiones bajos**: ______Overall Impact:______ y ______AMZL-Owned (Root Causes):______
+
+6. **Emoji**: 🟢 favorable (>98.19), 🟡 cerca, 🔴 unfavorable (<98.19)
+
+7. **Casos críticos específicos**:
+   - Si proporciono eventos específicos (ej: "Route A79 abandoned", "Store LZYN blocked Fri-Mon"), inclúyelos como RC.X.1
+   - Formato: "RC.3.1 – Critical Saturday event: Route A79 DCOM abandoned by DA at 20:00..."
+
+8. **Action Plans - SIN LITERATURA IA**:
+   - Lenguaje directo, operacional, sin florituras
+   - Owner: SIEMPRE lluciafe@ (salvo que especifique otro)
+   - ETA: WK[siguiente semana]
+   - Ejemplos de tono correcto (sin literatura):
+     * ✅ "Escalation sent to Hub Account Manager requesting action plans regarding Store LZYN blocked scenario"
+     * ✅ "Implement DSP escalation protocol for DA abandonment requiring immediate missort backup"
+     * ❌ "Leverage strategic stakeholder alignment to optimize cross-functional collaboration" (muy IA)
+
+9. **Elaboración de notas breves**:
+   - "A79 abandoned 20:00 illness 1:30h unreachable missort 17 parcels" → "Critical Saturday event: Route A79 DCOM abandoned by DA at 20:00 claiming illness after 1:30h unreachable, forcing missort rescue affecting 17 parcels"
+   - "A33 Gijon DA final work day problems" → "Issues including A33 Gijón DA final work day performance problems"
+   - DSPs super breves: "NOSP (20.5%, 16 parcels): No contact attempts before CNA"
+
+10. **Headers DSPs variados**:
+    - Usa "__    Other DSPs:__" o "__    Top Opportunity DSPs:__" según contexto
+    - Puedes usar indentación especial si lo proporciono: "    __   HUB (59.6%, 34 parcels)__"
+
+11. **NO incluyas**: RCs <5 bps, literatura IA, contexto excesivo
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2500,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== TPH FUNCTIONS =====
+        
+        function fillTPHSampleData() {
+            const sampleData = `Daily:
+2026-W03	TUE-27-JAN
+Intro
+1.1	TPH Actual	76.95
+1.2	Actual vs TPH Plan (W-1)	16.46
+1.3	TPH var. Actuals vs Plan (W-1) %	27.21%
+1.4	Net Volume Impact (W-1 vs Actuals)	5.22
+1.5	Direct Hours Impact (W-1 Vs Actuals)	11.65
+1.6	Indirect Hours Impact (W-1 Vs Actuals)	-1.30
+1.7	Other Impacts (W-1 Vs Actuals)	0.89
+Net Volume Impact
+2.1	Volume Caps. Impact (W-1)	0.00
+2.2	Controllable Volume Impact (W-1)	3.73
+2.3	AMZL Dispatched Shipments	16,326
+2.4	Labor Volume Plan W-1	15,027
+2.5	Uncontrollable Volume Impact (W-1)	1.49
+Direct hours
+3.1	Rostered Hours Impact (W-1 Vs Actuals)	2.90
+3.2	SLOPE/ALPS Rostered Hours Plan W-1	187.59
+3.3	Rostered Hours Actuals	146.74
+3.4	NRW Hours Impact (W-1 Vs Actuals)	0.00
+3.5	NRW Hours Actuals	0.00
+3.6	Absenteeism Impact (W-1 Vs Actuals)	6.92
+3.7	SLOPE/ALPS Absence Hours Plan W1	-9.73
+3.8	Actual Absence Hours	-34.00
+3.9	VET Achievable Impact (W-1 Vs Actuals)	0.58
+3.10	VET Hrs (Plan W1)	2.03
+3.11	Net VET Actioned	0.00
+3.12	VTO Achievable Impact (W-1 Vs Actuals)	1.14
+3.13	VTO Achievable as per Plan W1	0.00
+3.14	Net VTO Actioned	-4.00
+Indirect hours
+4.1	Indirect Hours Plan W-1	60.86
+4.2	Actual Indirect Hours	65.43`;
+            
+            document.getElementById('tphRawData').value = sampleData;
+            document.getElementById('tphDirectHoursNotes').value = `Rostered: -40.85hrs menos staffing necesario
+Absenteeism: -24.27hrs mejor que plan
+VTO: -4hrs actionado vs 0 plan`;
+            
+            document.getElementById('tphIndirectHoursNotes').value = `+4.57hrs más que plan
+3L3 doing direct Dolphin tasks -6hrs (Induct, Reverse, Container)
+YM PM direct tasks -1.23hrs (Reverse Receive)
+Perfect Mile not updated: shows 65.43 vs FCLM 55.52 (+9.91hrs discrepancy)`;
+            
+            document.getElementById('tphVolumeNotes').value = '+8.64% volume heaviness';
+            document.getElementById('tphAdditionalContext').value = '';
+        }
+
+        async function generateTPHBridge() {
+            const rawData = document.getElementById('tphRawData').value;
+            const directHoursNotes = document.getElementById('tphDirectHoursNotes').value;
+            const indirectHoursNotes = document.getElementById('tphIndirectHoursNotes').value;
+            const volumeNotes = document.getElementById('tphVolumeNotes').value;
+            const additionalContext = document.getElementById('tphAdditionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de TPH primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'tph';
+            currentRawData = rawData;
+            currentContext = JSON.stringify({
+                directHoursNotes,
+                indirectHoursNotes,
+                volumeNotes,
+                additionalContext
+            });
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de TPH (Throughput per Hour) para Amazon Delivery Stations.
+
+A continuación te voy a proporcionar:
+1. Datos en bruto de TPH con todas las métricas de descomposición
+2. Notas breves sobre las razones de las desviaciones principales
+
+Tu trabajo es GENERAR el bridge completo en el formato exacto.
+
+FORMATO EXACTO A SEGUIR:
+
+DAS1 Actual TPH – [DAY-DATE] at [X], favorable vs W-1 Plan by +[Y] TPH (+[Z]%), driven by:
+ 
+i) +[X] TPH from Net Volume Impact
+ii) +[X] TPH from Direct Hours
+iii) -[X] TPH from Indirect Hours
+iv) +[X] TPH from Other Impacts
+ 
+__RC1: Net Volume Impact (+[X] TPH)__
+resulting from +[X]% volume heaviness
+ 
+- Planned Volume: [X]
+- Actual Volume: [X]
+ 
+__RC2: Direct Hours Impact (+[X] TPH)__ driven by:
+ 
+I. Rostered Hours Impact (+[X] TPH):
+[X] hrs Actual vs [X] hrs Plan W-1
+ 
+-[X] hours less due to:
+[Explicación desarrollada de las notas breves]
+ 
+II. Absenteeism Impact (+[X] TPH):
+Actual: -[X] hrs vs Plan: -[X] hrs
+Actual hrs vs Plan: [X] hrs
+[Explicación breve si es relevante]
+ 
+III. VET Impact (+[X] TPH):
+[X] hrs VET actioned vs +[X] hrs planned
+[Explicación si relevante]
+ 
+IV. VTO Impact (+[X] TPH):
+-[X] hrs VTO actioned vs [X] hrs planned
+[Explicación si relevante]
+
+[Si hay más componentes como NRW, SET, añadirlos con numeración romana]
+ 
+__RC3: Indirect Hours Impact (-[X] TPH)__
+Actual [X] hrs vs [X] hrs Plan W-1 driven by:
+ 
++[X] hours more due to:
+ 
+(I).   Plan hours Horizon in W-1: [X] hrs
+
+(II).  Actual FCLM hours: [X] hrs
+-[X] hours:
+
+[Aquí DESARROLLA las notas breves sobre 3L3, YM, PM, etc. con formato profesional]
+
+(III). Perfect Mile hours: [Si hay discrepancia con FCLM, explicar]
+
+DATOS EN BRUTO DE TPH:
+${rawData}
+
+NOTAS MANUALES BREVES:
+
+Direct Hours:
+${directHoursNotes || 'No especificado'}
+
+Indirect Hours:
+${indirectHoursNotes || 'No especificado'}
+
+Volume Impact:
+${volumeNotes || 'No especificado'}
+
+CONTEXTO ADICIONAL:
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+1. Extrae TPH Actual de la fila "1.1 TPH Actual"
+2. Extrae Actual vs TPH Plan (W-1) de la fila "1.2"
+3. Extrae % variance de la fila "1.3"
+4. Usa "favorable" si es positivo, "unfavorable" si es negativo
+5. Descompón en i) Net Volume ii) Direct Hours iii) Indirect Hours iv) Other Impacts
+6. Para cada RC, usa EXACTAMENTE el formato mostrado con __RC1:__, __RC2:__, __RC3:__ con doble underscore
+7. IMPORTANTE - Volume heaviness/lightness:
+   - Si Actual Volume > Planned Volume → usa "volume heaviness" (más pesado)
+   - Si Actual Volume < Planned Volume → usa "volume lightness" (más ligero)
+   - Calcula %: ((Actual Volume - Planned Volume) / Planned Volume) × 100
+   - Usa + para heaviness, - para lightness
+8. Para Direct Hours, numera con I, II, III, IV, etc. cada componente (Rostered, Absenteeism, VET, VTO, NRW, SET)
+9. Para Indirect Hours, usa (I), (II), (III) con paréntesis
+10. IMPORTANTE - BREVEDAD EN RCs: Las explicaciones de los RCs deben ser CONCISAS y DIRECTAS. Evita repetir información ya mostrada en los números. Por ejemplo:
+    - ❌ MAL: "(i) -6 hours driven by 3 L3s who were performing direct hours tasks at Dolphin station including Induct, Reverse Received, Reverse Stow and Container building task"
+    - ✅ BIEN: "(i) -6 hours driven by 3 L3s doing direct tasks at Dolphin (Induct, Reverse, Stow, Container building)"
+    - ❌ MAL: "(ii) -1.23 hours driven by Yard Marshall PM who was performing direct hours tasks specifically Reverse Receive"
+    - ✅ BIEN: "(ii) -1.23 hours driven by YM PM doing Reverse Receive"
+11. Las notas breves que te proporciono son ESQUEMÁTICAS. Desarróllalas pero manteniendo CONCISIÓN - solo añade el contexto mínimo necesario para entender el issue
+12. Mantén el espaciado y formato EXACTO mostrado arriba, incluyendo saltos de línea
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2500,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== L&U FUNCTIONS =====
+        
+        function fillLUSampleData() {
+            const sampleData = `L&U DPMO: 357 DPMO (-31.12% WoW) | 48 units (-33.64% WoW)
+LATE DELIVERY: 297 DPMO | 40 units (-30.84% WoW) | Target: 653 DPMO
+UNDELIVERED: 59 DPMO | 8 units (-44.83% WoW) | Target: 126 DPMO`;
+            
+            document.getElementById('luRawData').value = sampleData;
+            
+            document.getElementById('luLateDelivery').value = `RC1: Not Delivered Never Attempted Late (31 units) 300 DPMO
+Carrier VPM 6 units, Without attempt HUBDP 1 unit, Missing 4 units, MNR VPM 1 unit, Destroyed/Disposed 2 units, Locker insufficient 1 unit, Manual return too big 1 unit
+
+RC2: Delivered Late Attempted Ontime (4 units)
+Day +6 EAD: 2 units
+Day +1 EAD: 2 units
+
+RC3: Delivered Late Attempted Late (3 units)
+Day +1 Relabel required: 2 units
+Day +1 Induct status cannot be inducted: 1 unit`;
+            
+            document.getElementById('luUndelivered').value = `RC1: Not Delivered Attempted Ontime (8 units)
+Customer Unavailable: 4 units
+Address Issue UTL: 1 unit
+Business Closed: 3 units`;
+            
+            document.getElementById('luPolarisMetrics').value = `Ageing Shipments (3+ Day): 1,821 DPMO (-53.16% WoW) target 2,000
+FPY RTS/sideline not inducted: 262 DPMO (+17.07% WoW) target 400
+EOD Scrub Missing: Trigger 7/7 days
+EOD Scrub Lost: Trigger 7/7 days`;
+            
+            document.getElementById('luActionPlans').value = `Review store performance with Hub Account Manager - gyyln - WK05
+Review PNOV trends identify DA top opportunities bad practices increasing missing - gyyln - WK05`;
+            
+            document.getElementById('luAdditionalContext').value = '';
+        }
+
+        async function generateLUBridge() {
+            const rawData = document.getElementById('luRawData').value;
+            const lateDelivery = document.getElementById('luLateDelivery').value;
+            const undelivered = document.getElementById('luUndelivered').value;
+            const polarisMetrics = document.getElementById('luPolarisMetrics').value;
+            const actionPlans = document.getElementById('luActionPlans').value;
+            const additionalContext = document.getElementById('luAdditionalContext').value;
+
+            if (!rawData.trim()) {
+                alert('⚠️ Por favor pega los datos de L&U primero');
+                return;
+            }
+
+            // Save current data for refinement
+            currentBridgeType = 'lu';
+            currentRawData = rawData;
+            currentContext = JSON.stringify({
+                lateDelivery,
+                undelivered,
+                polarisMetrics,
+                actionPlans,
+                additionalContext
+            });
+            conversationHistory = []; // Reset conversation for new generation
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges de L&U (Late & Undelivered) para Amazon Delivery Stations.
+
+A continuación te voy a proporcionar:
+1. Datos de L&U DPMO, units, WoW comparisons, targets
+2. Dive deep manual de Root Causes (Late Delivery y Undelivered)
+3. Polaris Related Metrics
+4. Action Plans
+
+Tu trabajo es GENERAR el bridge completo en el formato exacto.
+
+FORMATO EXACTO A SEGUIR:
+
+L&U DPMO DAS1 | [X] DPMO ([+/-Y]% WoW) | [Z] units ([+/-W]% WoW) 
+
+LATE DELIVERY - [X] units ([+/-Y]%) | [Z] DPMO | [W] DPMO favorable vs December target [TARGET] DPMO 
+
+UNDELIVERED - [X] units ([+/-Y]%)|[Z] DPMO | [W] DPMO favorable vs December target [TARGET] DPMO 
+
+Root Causes:
+
+LATE DELIVERY ([X] units) [Y] DPMO
+  RC1. [Categoría principal] ([X] units) [Y] DPMO.
+RC1.1 [Subcategoría] ([X] units):
+[Lista breve de razones con units]
+[Otra razón] ([X] units)
+[Otra razón] ([X] units)
+
+RC2. [Categoría 2] ([X] units).
+RC2.1 [Subcategoría] ([X] units)
+RC2.2 [Subcategoría] ([X] units)
+ 
+RC3. [Categoría 3] ([X] units).
+RC3.1 [Subcategoría] ([X] units). [Razón si es relevante]
+RC3.2 [Subcategoría] ([X] units). [Razón si es relevante]
+ 
+ 
+NOT DELIVERED, UNDELIVERABLE ([X] units) [Y] DPMO
+RC1. [Categoría principal] ([X] units)
+RC1.1 [Subcategoría] ([X] units).
+RC1.2 [Subcategoría] ([X] units).
+RC1.3 [Subcategoría] ([X] units).
+ 
+ 
+POLARIS Related metrics:
+[Métrica 1]: [X] DPMO ([+/-Y]%) WoW (target [Z])
+[Métrica 2]: [X] DPMO ([+/-Y]%) WoW (target [Z])
+[Métrica 3]: [Descripción]           
+[Métrica 4]: [Descripción]
+
+AP1: [Acción detallada]; Owner: [owner], ETA: [timeline]
+ 
+AP2: [Acción detallada]; Owner: [owner], ETA: [timeline]
+
+DATOS EN BRUTO DE L&U:
+${rawData}
+
+DIVE DEEP MANUAL:
+
+Late Delivery Root Causes:
+${lateDelivery || 'No especificado'}
+
+Undelivered Root Causes:
+${undelivered || 'No especificado'}
+
+Polaris Metrics:
+${polarisMetrics || 'No especificado'}
+
+Action Plans:
+${actionPlans || 'No especificado'}
+
+CONTEXTO ADICIONAL:
+${additionalContext || 'Ninguno proporcionado'}
+
+INSTRUCCIONES CRÍTICAS:
+1. Extrae L&U DPMO total, units, y WoW % de la data
+2. Separa LATE DELIVERY vs UNDELIVERED con sus respectivos DPMO, units, WoW
+3. Calcula "favorable vs December target" restando: Target - Actual
+4. Usa el formato EXACTO mostrado arriba con espaciado e indentación precisa
+5. Para Root Causes, organiza en RC1, RC2, RC3 con subcategorías RC1.1, RC1.2, etc.
+6. Las notas de dive deep son BREVES. Desarróllalas ligeramente pero mantén CONCISIÓN:
+   - ❌ MAL: "Carrier VPM represents 6 units of impact driven by vendor performance management issues at the carrier level resulting in delayed deliveries"
+   - ✅ BIEN: "Carrier VPM (6 units)" o "Carrier VPM (6 units): Vendor performance issues at carrier"
+7. Para Polaris metrics, mantén el formato con parentesis para WoW y "target X" al final
+8. Para Action Plans, numera AP1, AP2, etc. con formato: [Acción]; Owner: [owner], ETA: [timeline]
+9. Usa espaciado exacto: una línea en blanco entre secciones principales
+10. Para listas de razones bajo RC1.1, RC1.2, etc., mantén formato simple: [Razón] ([X] units)
+11. Si los Action Plans vienen en formato breve, expándelos ligeramente pero manteniendo claridad
+
+Genera SOLO el bridge, sin texto adicional antes o después.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2500,
+                        messages: [
+                            { role: "user", content: prompt }
+                        ],
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const bridgeText = result.content[0].text;
+
+                // Save to conversation history
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                // Mostrar resultado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al generar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        // ===== FDDS CASERO FUNCTIONS =====
+        
+        function fillFDDSCaseroSampleData() {
+            document.getElementById('fddsCaseroData').value = `FDDS: 99.00%
+Total Misses: 172
+bps vs D-1: -31
+
+Customer Unavailable: 58 bps, 98 parcels, +10 bps vs D-1
+  DCOM: 51 parcels
+  NOSP: 30 parcels
+  HUB: 17 parcels
+
+Business Closed: 14 bps, 23 parcels, +2 bps vs D-1
+  DCOM: 9 parcels
+  NOSP: 9 parcels
+  HUB: 5 parcels
+
+Unable To Locate: 8 bps, 14 parcels, +2 bps vs D-1
+  DCOM: 10 parcels
+  NOSP: 2 parcels
+  HUB: 2 parcels`;
+            
+            document.getElementById('fddsCaseroMainRC').value = `26 packages not attempted by HUB store due to health problems. DCOM assuming all the parcels.
+
+A34 Route from Gijon. Low performance AA needing 15 stops support.
+
+A75 Route from Oviedo. Low performance AA needing 15 stops support.
+
+A83 villages near to Oviedo. Highly disperse route with +100 stops, needing support.
+
+A47 from Lugones. Highly disperse route with +100 stops, needing support.`;
+        }
+
+        async function generateFDDSCaseroBridge() {
+            const data = document.getElementById('fddsCaseroData').value;
+            const mainRC = document.getElementById('fddsCaseroMainRC').value;
+
+            if (!data.trim()) {
+                alert('⚠️ Por favor pega la data de PerfectMile');
+                return;
+            }
+
+            currentBridgeType = 'fdds-casero';
+            currentRawData = data;
+            currentContext = JSON.stringify({ mainRC });
+            conversationHistory = [];
+
+            document.getElementById('loading').classList.add('active');
+            document.getElementById('outputSection').classList.remove('active');
+
+            try {
+                const prompt = `Eres un asistente experto en generar bridges FDDS Casero para Amazon Delivery Stations.
+
+Este es el FORMATO SIMPLIFICADO cuando tienes data reducida de PerfectMile (no tabla completa).
+
+FORMATO EXACTO:
+
+🟢 FDDS at [X]% with [Y] misses +[Z] bps favorable to target of 98.19%, [W] bps vs D-1).
+
+____AMZL-Owned (Root Causes):____
+
+[X] bps - Customer Unavailable, [+/-Y] bps vs D-1
+    RC.1 – [N] parcels marked as Customer Unavailable
+    RC.1.1 – DCOM: [N] parcels ([%])
+    RC.1.2 – NOSP: [N] parcels ([%])
+    RC.1.3 – HUB: [N] parcels ([%])
+
+[X] bps - Business Closed, [+/-Y] bps vs D-1
+    RC.1 – [N] parcels marked as Business Closed
+    RC.1.1 – DCOM: [N] parcels ([%])
+    RC.1.2 – NOSP: [N] parcels ([%])
+    RC.1.3 – HUB: [N] parcels ([%])
+
+[X] bps - Unable To Locate, [+/-Y] bps vs D-1
+    RC.1 – [N] parcels marked as Unable To Locate
+    RC.1.1 – DCOM: [N] parcels ([%])
+    RC.1.2 – NOSP: [N] parcels ([%])
+    RC.1.3 – HUB: [N] parcels ([%])
+
+__MAIN RC:__
+- [Issue principal elaborado con contexto operacional]
+- [Ruta]: [descripción detallada]
+- [Ruta]: [descripción]
+
+Action Plans:
+AP1 – [Acción específica basada en Main RC] | Owner: [XMDO/Operations/DSL] | ETA: [WKxx]
+AP2 – [Acción] | Owner: [owner] | ETA: [timeline]
+AP3 – [Acción] | Owner: [owner] | ETA: [timeline]
+
+DATA DE PERFECTMILE:
+${data}
+
+MAIN RC (Notas Operacionales):
+${mainRC || 'No especificado'}
+
+INSTRUCCIONES CRÍTICAS:
+
+1. **Extrae de la data**: FDDS %, Total Misses, bps vs D-1, categorías con bps/parcels/splits
+2. **Calcula bps vs target 98.19**: (FDDS% - 98.19) × 10,000
+3. **Emoji**: 🟢 favorable (>98.19), 🟡 cerca, 🔴 unfavorable
+4. **Cuádruple underscore**: ____AMZL-Owned (Root Causes):____
+5. **Calcula % de splits**: Si DCOM 51, NOSP 30, HUB 17 (total 98) → DCOM 52%, NOSP 31%, HUB 17%
+6. **Main RC elaboración** (convierte notas esquemáticas en texto profesional):
+   - "26 packages not attempted HUB health problems DCOM assuming" → "26 packages not attempted by a HUB store due to health problems. DCOM assuming all the parcels."
+   - "A34 Gijon low performance AA 15 stops support" → "A34 Route from Gijon. Low performance AA needing 15 stops support."
+7. **Action Plans automáticos** basados en Main RC:
+   - Performance issues → Coaching/training APs
+   - Rutas dispersas → Route optimization APs
+   - HUB issues → Escalation/backup APs
+   - Owners: XMDO, Operations, DSL, FQA
+8. **Formato exacto** con espaciado e indentación
+
+Genera SOLO el bridge, sin texto adicional.`;
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: [{ role: "user", content: prompt }]
+                    })
+                });
+
+                const result = await response.json();
+                if (result.error) throw new Error(result.error.message);
+
+                const bridgeText = result.content[0].text;
+                conversationHistory.push(
+                    { role: "user", content: prompt },
+                    { role: "assistant", content: bridgeText }
+                );
+
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('outputSection').classList.add('active');
+                document.getElementById('bridgeOutput').textContent = bridgeText;
+                document.getElementById('refineSection').style.display = 'block';
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error: ' + error.message);
+            }
+        }
+
+        // ===== REFINE BRIDGE FUNCTION =====
+        async function refineBridge() {
+            const feedback = document.getElementById('refineFeedback').value;
+
+            if (!feedback.trim()) {
+                alert('⚠️ Por favor describe qué quieres cambiar o añadir');
+                return;
+            }
+
+            if (conversationHistory.length === 0) {
+                alert('⚠️ Primero genera un bridge inicial');
+                return;
+            }
+
+            // Mostrar loading
+            document.getElementById('loading').classList.add('active');
+
+            try {
+                // Add user's refinement request to conversation
+                conversationHistory.push({
+                    role: "user",
+                    content: `El bridge anterior está bien pero necesito estos cambios/adiciones:
+
+${feedback}
+
+Por favor, regenera el bridge completo incorporando estos cambios pero manteniendo la misma estructura y formato. Los datos originales siguen siendo los mismos.
+
+RECUERDA: Genera el bridge COMPLETO de nuevo (no solo los cambios), manteniendo el formato exacto.`
+                });
+
+                const response = await fetch("/.netlify/functions/generate-bridge", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        model: "claude-sonnet-4-20250514",
+                        max_tokens: 2000,
+                        messages: conversationHistory
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error.message || 'Error desconocido de la API');
+                }
+
+                const refinedBridgeText = result.content[0].text;
+
+                // Update conversation history
+                conversationHistory.push({
+                    role: "assistant",
+                    content: refinedBridgeText
+                });
+
+                // Mostrar resultado refinado
+                document.getElementById('loading').classList.remove('active');
+                document.getElementById('bridgeOutput').textContent = refinedBridgeText;
+                
+                // Clear feedback textarea for next refinement
+                document.getElementById('refineFeedback').value = '';
+                
+                // Show success message
+                const tempMsg = document.createElement('div');
+                tempMsg.style.cssText = 'background: #1a7f37; color: white; padding: 10px; border-radius: 5px; margin-top: 10px; text-align: center;';
+                tempMsg.textContent = '✅ Bridge refinado exitosamente';
+                document.getElementById('refineSection').appendChild(tempMsg);
+                setTimeout(() => tempMsg.remove(), 3000);
+
+            } catch (error) {
+                document.getElementById('loading').classList.remove('active');
+                alert('❌ Error al refinar el bridge: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+    </script>
+</body>
+</html>

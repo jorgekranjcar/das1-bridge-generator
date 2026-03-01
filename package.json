@@ -1,0 +1,8 @@
+{
+  "name": "das1-bridge-generator",
+  "version": "1.0.0",
+  "description": "DAS1 Bridge Generator with Netlify Functions",
+  "dependencies": {
+    "node-fetch": "^2.6.7"
+  }
+}
